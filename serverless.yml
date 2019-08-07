@@ -1,0 +1,60 @@
+service: scooter
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /f/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
+
+  createScooter:
+    handler: scootersHandler.create
+    events:
+      - http:
+          path: scooters
+          method: post
+
+  getScooters:
+    handler: scootersHandler.all
+    events:
+      - http:
+          path: scooters
+          method: get
+
+  # SORACOM Funk will interact with this service
+  updateScooter:
+    handler: scootersHandler.update
+    events:
+      - http:
+          path: scooters/{id}
+          method: patch
+          request:
+            parameters:
+              paths:
+                id: true
+
+  startRide:
+    handler: transactionsHandler.start
+    events:
+      - http:
+          path: transactions
+          method: post
+  stopRide:
+    handler: transactionsHandler.stop
+    events:
+      - http:
+          path: transactions/{id}
+          method: patch
+          request:
+            parameters:
+              paths:
+                id: true

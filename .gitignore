@@ -1,0 +1,16 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Environmental variables
+.env
+
+# Certs
+
+rds-combined-ca-bundle.pem
+
+notes.md
+.DS_Store
