@@ -7,6 +7,8 @@ const transactionSchema = mongoose.Schema({
 	token: { type: String, required: true },
 	start: { type: Date, required: true },
 	end: { type: Date }
+}, {
+	timestamps: true
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);
