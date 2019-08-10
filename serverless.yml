@@ -3,6 +3,28 @@ service: scooter
 provider:
   name: aws
   runtime: nodejs10.x
+  environment:
+    STRIPE_SECRET_KEY: ${file(./env.yml):default.STRIPE_SECRET_KEY}
+    MONGO_URL: ${file(./env.yml):default.MONGO_URL}
+  vpc:
+    securityGroupIds:
+      - sg-5bb00e2f
+      - sg-163e825e
+    subnetIds:
+      - subnet-37fca853
+      - subnet-a5da32aa
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'ec2:CreateNetworkInterface'
+        - 'ec2:CreateNetworkInterface'
+        - 'ec2:DescribeNetworkInterfaces'
+        - 'ec2:DescribeVpcs'
+        - 'ec2:DeleteNetworkInterface'
+        - 'ec2:DescribeSubnets'
+        - 'ec2:DescribeSecurityGroups'
+      Resource:
+        '*'
 
 functions:
   hello:

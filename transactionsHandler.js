@@ -1,8 +1,5 @@
 'use strict';
 
-const dotenv = require('dotenv');
-dotenv.config();
-
 const fs = require('fs');
 const certFile = fs.readFileSync('./rds-combined-ca-bundle.pem');
 

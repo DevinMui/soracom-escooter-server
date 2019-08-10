@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^8.0.0",
     "fs": "0.0.1-security",
     "mongoose": "^5.6.8",
     "stripe": "^7.6.0"
