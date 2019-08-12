@@ -31,15 +31,16 @@ functions:
     handler: handler.hello
     events:
       - http:
-          path: /f/{id}
+          path: /
           method: get
           request:
             parameters:
               paths:
                 id: true
 
-  createScooter:
-    handler: scootersHandler.create
+  # SORACOM Funk will interact with this service
+  createOrUpdateScooter:
+    handler: scootersHandler.createOrUpdate
     events:
       - http:
           path: scooters
@@ -51,18 +52,6 @@ functions:
       - http:
           path: scooters
           method: get
-
-  # SORACOM Funk will interact with this service
-  updateScooter:
-    handler: scootersHandler.update
-    events:
-      - http:
-          path: scooters/{id}
-          method: patch
-          request:
-            parameters:
-              paths:
-                id: true
 
   startRide:
     handler: transactionsHandler.start
