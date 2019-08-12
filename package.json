@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "fs": "0.0.1-security",
+    "geolocation-utils": "^1.2.2",
     "mongoose": "^5.6.8",
     "stripe": "^7.6.0"
   }
