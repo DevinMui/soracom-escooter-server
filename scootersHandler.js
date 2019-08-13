@@ -46,7 +46,7 @@ module.exports.createOrUpdate = async (event, context) => {
             scooter.coords = event.body.coords || scooter.coords;
             scooter.battery = event.body.battery || scooter.battery;
             scooter.speed = event.body.speed || scooter.speed;
-            scooter.price = defaultPriceInCents + priceHikePerScooterInCents*scooterCount;
+            scooter.price = !scooter.inUse ? defaultPriceInCents + priceHikePerScooterInCents*scooterCount : scooter.price;
             await scooter.save();
             return {
                 statusCode: 200,
