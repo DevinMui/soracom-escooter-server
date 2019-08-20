@@ -70,7 +70,8 @@ module.exports.clear = async (event, context) => {
 module.exports.createOrUpdate = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
     try {
-        const scooter = await Scooter.findOne({ mac: event.body.mac });
+        const body = JSON.parse(event.body);
+        const scooter = await Scooter.findOne({ mac: body.mac });
         
         // calculate surge price based on gps
         const inUseScooters = await Scooter.find({ inUse: true });
@@ -83,8 +84,8 @@ module.exports.createOrUpdate = async (event, context) => {
         for(inUseScooter of inUseScooters){
             if(geolocation.distanceTo(
                 {
-                    lat: event.body.coords.lat,
-                    lon: event.body.coords.lng
+                    lat: body.coords.lat,
+                    lon: body.coords.lng
                 },
                 {
                     lat: inUseScooter.coords.lat,
@@ -96,9 +97,9 @@ module.exports.createOrUpdate = async (event, context) => {
 
         // update
         if(scooter){
-            scooter.coords = event.body.coords || scooter.coords;
-            scooter.battery = event.body.battery || scooter.battery;
-            scooter.speed = event.body.speed || scooter.speed;
+            scooter.coords = body.coords || scooter.coords;
+            scooter.battery = body.battery || scooter.battery;
+            scooter.speed = body.speed || scooter.speed;
             scooter.price = !scooter.inUse ? defaultPriceInCents + priceHikePerScooterInCents*scooterCount : scooter.price;
             await scooter.save();
             return {
@@ -112,10 +113,10 @@ module.exports.createOrUpdate = async (event, context) => {
         }
         // create
         const newScooter = await new Scooter({
-            mac: event.body.mac,
-            coords: event.body.coords,
-            battery: event.body.battery,
-            speed: event.body.speed,
+            mac: body.mac,
+            coords: body.coords,
+            battery: body.battery,
+            speed: body.speed,
             price: defaultPriceInCents + priceHikePerScooterInCents*scooterCount
         }).save();
 

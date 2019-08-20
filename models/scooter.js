@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 const scooterSchema = mongoose.Schema({
-    mac: { type: Number, required: true, unique: true },
+    mac: { type: String, required: true, unique: true },
     coords: {
         lng: { type: Number },
         lat: { type: Number }

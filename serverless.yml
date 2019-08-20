@@ -46,7 +46,7 @@ functions:
           method: get
 
   getById:
-    handler: scooters.getById
+    handler: scootersHandler.getById
     events:
       - http:
           path: scooters/{id}

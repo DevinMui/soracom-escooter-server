@@ -18,14 +18,15 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 module.exports.start = async (event, context) => {    
     try {
-        let scooter = await Scooter.findOne({ mac: event.body.mac });
+        const body = JSON.parse(event.body);
+        let scooter = await Scooter.findOne({ mac: body.mac });
         if(!scooter) throw new Error("scooter not found");
 
         scooter.inUse = true;
         scooter = await scooter.save();
         let transaction = await new Transaction({
             scooterId: scooter._id,
-            token: event.body.token,
+            token: body.token,
             start: new Date()
         }).save();
         return {
