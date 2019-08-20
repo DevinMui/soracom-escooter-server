@@ -58,7 +58,7 @@ module.exports.createOrUpdate = async (event, context) => {
             };
         }
         // create
-        const scooter = await new Scooter({
+        const newScooter = await new Scooter({
             mac: event.body.mac,
             coords: event.body.coords,
             battery: event.body.battery,
@@ -69,7 +69,7 @@ module.exports.createOrUpdate = async (event, context) => {
         return {
             statusCode: 200,
             body: JSON.stringify(
-                scooter,
+                newScooter,
                 null,
                 4
             )
