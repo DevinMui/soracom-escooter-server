@@ -75,10 +75,11 @@ module.exports.createOrUpdate = async (event, context) => {
         // calculate surge price based on gps
         const inUseScooters = await Scooter.find({ inUse: true });
 
-        defaultPriceInCents = 15; // cents
-        priceHikePerScooterInCents = 1; // 1 cent
-        distanceToleranceInMeters = 1600; // roughly a mile
-        scooterCount = 0;
+        const defaultPriceInCents = 15; // cents
+        const priceHikePerScooterInCents = 1; // 1 cent
+        const distanceToleranceInMeters = 1600; // roughly a mile
+        
+        let scooterCount = 0;
         for(inUseScooter of inUseScooters){
             if(geolocation.distanceTo(
                 {
