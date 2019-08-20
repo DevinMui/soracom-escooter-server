@@ -42,7 +42,7 @@ functions:
     handler: scootersHandler.clear
     events:
       - http:
-          path: scooters/clear
+          path: clear
           method: get
 
   getById:
@@ -50,6 +50,7 @@ functions:
     events:
       - http:
           path: scooters/{id}
+          method: get
           request:
             parameters:
               paths:
