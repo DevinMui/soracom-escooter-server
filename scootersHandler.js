@@ -15,6 +15,58 @@ mongoose.connect(url,options);
 
 var Scooter = require('./models/scooter');
 
+module.exports.getById = async (event, context) => {
+    try {
+        let scooter = await Scooter.findById( event.pathParameters.id );
+        return {
+            statusCode: 200,
+            body: JSON.stringify(
+                scooter,
+                null,
+                4
+            ),
+        };
+    } catch(err) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify(
+                {
+                    error: err.toString()
+                },
+                null,
+                4
+            )
+        };
+    }
+}
+
+module.exports.clear = async (event, context) => {
+    try {
+        await Scooter.deleteMany({})
+        return { 
+            statusCode: 200, 
+            body: JSON.stringify(
+                { 
+                    success: true 
+                }, 
+                null, 
+                4
+            )
+        };
+    }  catch(err) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify(
+                {
+                    error: err.toString()
+                },
+                null,
+                4
+            )
+        };
+    }
+}
+
 module.exports.createOrUpdate = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
     try {

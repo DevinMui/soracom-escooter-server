@@ -38,6 +38,23 @@ functions:
               paths:
                 id: true
 
+  clear:
+    handler: scootersHandler.clear
+    events:
+      - http:
+          path: scooters/clear
+          method: get
+
+  getById:
+    handler: scooters.getById
+    events:
+      - http:
+          path: scooters/{id}
+          request:
+            parameters:
+              paths:
+                id: true
+
   # SORACOM Funk will interact with this service
   createOrUpdateScooter:
     handler: scootersHandler.createOrUpdate
