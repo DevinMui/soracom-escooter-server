@@ -13,6 +13,7 @@ provider:
     subnetIds:
       - subnet-37fca853
       - subnet-a5da32aa
+      - subnet-b93e60f2
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
@@ -78,6 +79,7 @@ functions:
           path: transactions
           method: post
   stopRide:
+    timeout: 3
     handler: transactionsHandler.stop
     events:
       - http:
@@ -87,3 +89,4 @@ functions:
             parameters:
               paths:
                 id: true
+          cors: true

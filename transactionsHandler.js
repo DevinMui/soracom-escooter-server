@@ -17,6 +17,7 @@ const Transaction = require('./models/transaction');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 module.exports.start = async (event, context) => {    
+    context.callbackWaitsForEmptyEventLoop = false;
     try {
         const body = JSON.parse(event.body);
         let scooter = await Scooter.findOne({ mac: body.mac });
@@ -51,7 +52,8 @@ module.exports.start = async (event, context) => {
     }
 };
 
-module.exports.stop = async event => {
+module.exports.stop = async (event, context) => {
+    context.callbackWaitsForEmptyEventLoop = false;
     try {
         let transaction = await Transaction.findById(event.pathParameters.id);
         let scooter = await Scooter.findById(transaction.scooterId);
@@ -59,15 +61,16 @@ module.exports.stop = async event => {
         if(!transaction) throw new Error("transaction not found");
         if(!scooter) throw new Error("scooter not found");
 
-        scooter.inUse = false;
-        scooter = await scooter.save();
-
-        let min = (new Date() - transaction.start) / 60 / 1000;
+        let min = (new Date() - new Date(transaction.start)) / 60 / 1000;
         let charge = await stripe.charges.create({
-            amount: 100 + min * scooter.price,
+            amount: Math.ceil(100 + min * scooter.price), 
             currency: 'usd',
             source: transaction.token
         });
+
+        scooter.inUse = false;
+        scooter = await scooter.save();
+
         return {
             statusCode: 200,
             body: JSON.stringify(
@@ -77,6 +80,7 @@ module.exports.stop = async event => {
             )
         };
     } catch(err) {
+        console.log(err)
         return {
             statusCode: 400,
             body: JSON.stringify(
