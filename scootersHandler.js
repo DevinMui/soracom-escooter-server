@@ -70,7 +70,7 @@ module.exports.clear = async (event, context) => {
 module.exports.createOrUpdate = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
     try {
-        const body = JSON.parse(event.body);
+        const body = event;
         const scooter = await Scooter.findOne({ mac: body.mac });
         
         // calculate surge price based on gps
@@ -81,7 +81,7 @@ module.exports.createOrUpdate = async (event, context) => {
         const distanceToleranceInMeters = 1600; // roughly a mile
         
         let scooterCount = 0;
-        for(inUseScooter of inUseScooters){
+        for(var inUseScooter of inUseScooters){
             if(geolocation.distanceTo(
                 {
                     lat: body.coords.lat,
