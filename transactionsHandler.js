@@ -16,6 +16,32 @@ const Transaction = require('./models/transaction');
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+module.exports.all = async (event, context) => {
+    context.callbackWaitsForEmptyEventLoop = false;
+    try {
+        const transactions = await Transaction.find({}).populate('scooterId').exec()
+        return {
+            statusCode: 200,
+            body: JSON.stringify(
+                transactions,
+                null,
+                4
+            )
+        };
+    } catch(err) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify(
+                {
+                    error: err.toString()    
+                },
+                null,
+                4
+            )
+        };
+    }
+};
+
 module.exports.start = async (event, context) => {    
     context.callbackWaitsForEmptyEventLoop = false;
     try {

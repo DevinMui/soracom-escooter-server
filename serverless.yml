@@ -72,6 +72,13 @@ functions:
           path: scooters
           method: get
 
+  getTransactions:
+    handler: transactionsHandler.all
+    events:
+      - http:
+          path: transactions
+          method: get
+
   startRide:
     handler: transactionsHandler.start
     events:
