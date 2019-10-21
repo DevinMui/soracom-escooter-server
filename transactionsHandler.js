@@ -1,39 +1,37 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const certFile = fs.readFileSync('./rds-combined-ca-bundle.pem');
+const fs = require("fs");
+const certFile = fs.readFileSync("./rds-combined-ca-bundle.pem");
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const url = process.env.MONGO_URL;
 const options = {
     sslCA: certFile
 };
 
-mongoose.connect(url,options);
+mongoose.connect(url, options);
 
-const Scooter = require('./models/scooter');
-const Transaction = require('./models/transaction');
+const Scooter = require("./models/scooter");
+const Transaction = require("./models/transaction");
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 module.exports.all = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
     try {
-        const transactions = await Transaction.find({}).populate('scooterId').exec()
+        const transactions = await Transaction.find({})
+            .populate("scooterId")
+            .exec();
         return {
             statusCode: 200,
-            body: JSON.stringify(
-                transactions,
-                null,
-                4
-            )
+            body: JSON.stringify(transactions, null, 4)
         };
-    } catch(err) {
+    } catch (err) {
         return {
             statusCode: 400,
             body: JSON.stringify(
                 {
-                    error: err.toString()    
+                    error: err.toString()
                 },
                 null,
                 4
@@ -42,12 +40,12 @@ module.exports.all = async (event, context) => {
     }
 };
 
-module.exports.start = async (event, context) => {    
+module.exports.start = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
     try {
         const body = JSON.parse(event.body);
         let scooter = await Scooter.findOne({ mac: body.mac });
-        if(!scooter) throw new Error("scooter not found");
+        if (!scooter) throw new Error("scooter not found");
 
         scooter.inUse = true;
         scooter = await scooter.save();
@@ -58,13 +56,9 @@ module.exports.start = async (event, context) => {
         }).save();
         return {
             statusCode: 200,
-            body: JSON.stringify(
-                transaction,
-                null,
-                4
-            ),
+            body: JSON.stringify(transaction, null, 4)
         };
-    } catch(err) {
+    } catch (err) {
         return {
             statusCode: 400,
             body: JSON.stringify(
@@ -84,13 +78,13 @@ module.exports.stop = async (event, context) => {
         let transaction = await Transaction.findById(event.pathParameters.id);
         let scooter = await Scooter.findById(transaction.scooterId);
 
-        if(!transaction) throw new Error("transaction not found");
-        if(!scooter) throw new Error("scooter not found");
+        if (!transaction) throw new Error("transaction not found");
+        if (!scooter) throw new Error("scooter not found");
 
         let min = (new Date() - new Date(transaction.start)) / 60 / 1000;
         let charge = await stripe.charges.create({
-            amount: Math.ceil(100 + min * scooter.price), 
-            currency: 'usd',
+            amount: Math.ceil(100 + min * scooter.price),
+            currency: "usd",
             source: transaction.token
         });
 
@@ -99,14 +93,10 @@ module.exports.stop = async (event, context) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify(
-                charge,
-                null,
-                4
-            )
+            body: JSON.stringify(charge, null, 4)
         };
-    } catch(err) {
-        console.log(err)
+    } catch (err) {
+        console.log(err);
         return {
             statusCode: 400,
             body: JSON.stringify(

@@ -1,14 +1,21 @@
-'use strict';
+"use strict";
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const transactionSchema = mongoose.Schema({
-	scooterId: { type: mongoose.Schema.Types.ObjectId, ref: 'Scooter', required: true },
-	token: { type: String, required: true },
-	start: { type: Date, required: true },
-	end: { type: Date }
-}, {
-	timestamps: true
-});
+const transactionSchema = mongoose.Schema(
+    {
+        scooterId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Scooter",
+            required: true
+        },
+        token: { type: String, required: true },
+        start: { type: Date, required: true },
+        end: { type: Date }
+    },
+    {
+        timestamps: true
+    }
+);
 
-module.exports = mongoose.model('Transaction', transactionSchema);
+module.exports = mongoose.model("Transaction", transactionSchema);

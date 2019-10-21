@@ -1,32 +1,28 @@
-'use strict';
+"use strict";
 
-const fs = require('fs');
-const certFile = fs.readFileSync('./rds-combined-ca-bundle.pem');
+const fs = require("fs");
+const certFile = fs.readFileSync("./rds-combined-ca-bundle.pem");
 
-const geolocation = require('geolocation-utils');
-const mongoose = require('mongoose');
+const geolocation = require("geolocation-utils");
+const mongoose = require("mongoose");
 const url = process.env.MONGO_URL;
 const options = {
     sslCA: certFile,
     useNewUrlParser: true
 };
 
-mongoose.connect(url,options);
+mongoose.connect(url, options);
 
-var Scooter = require('./models/scooter');
+var Scooter = require("./models/scooter");
 
 module.exports.getById = async (event, context) => {
     try {
-        let scooter = await Scooter.findById( event.pathParameters.id );
+        let scooter = await Scooter.findById(event.pathParameters.id);
         return {
             statusCode: 200,
-            body: JSON.stringify(
-                scooter,
-                null,
-                4
-            ),
+            body: JSON.stringify(scooter, null, 4)
         };
-    } catch(err) {
+    } catch (err) {
         return {
             statusCode: 400,
             body: JSON.stringify(
@@ -38,22 +34,22 @@ module.exports.getById = async (event, context) => {
             )
         };
     }
-}
+};
 
 module.exports.clear = async (event, context) => {
     try {
-        await Scooter.deleteMany({})
-        return { 
-            statusCode: 200, 
+        await Scooter.deleteMany({});
+        return {
+            statusCode: 200,
             body: JSON.stringify(
-                { 
-                    success: true 
-                }, 
-                null, 
+                {
+                    success: true
+                },
+                null,
                 4
             )
         };
-    }  catch(err) {
+    } catch (err) {
         return {
             statusCode: 400,
             body: JSON.stringify(
@@ -65,50 +61,51 @@ module.exports.clear = async (event, context) => {
             )
         };
     }
-}
+};
 
 module.exports.createOrUpdate = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = false;
     try {
         const body = event;
         const scooter = await Scooter.findOne({ mac: body.mac });
-        
+
         // calculate surge price based on gps
         const inUseScooters = await Scooter.find({ inUse: true });
 
         const defaultPriceInCents = 15; // cents
         const priceHikePerScooterInCents = 1; // 1 cent
         const distanceToleranceInMeters = 1600; // roughly a mile
-        
+
         let scooterCount = 0;
-        for(var inUseScooter of inUseScooters){
-            if(geolocation.distanceTo(
-                {
-                    lat: body.coords.lat,
-                    lon: body.coords.lng
-                },
-                {
-                    lat: inUseScooter.coords.lat,
-                    lon: inUseScooter.coords.lng
-                }
-            ) < distanceToleranceInMeters)
+        for (var inUseScooter of inUseScooters) {
+            if (
+                geolocation.distanceTo(
+                    {
+                        lat: body.coords.lat,
+                        lon: body.coords.lng
+                    },
+                    {
+                        lat: inUseScooter.coords.lat,
+                        lon: inUseScooter.coords.lng
+                    }
+                ) < distanceToleranceInMeters
+            )
                 scooterCount++;
         }
 
         // update
-        if(scooter){
+        if (scooter) {
             scooter.coords = body.coords || scooter.coords;
             scooter.battery = body.battery || scooter.battery;
             scooter.speed = body.speed || scooter.speed;
-            scooter.price = !scooter.inUse ? defaultPriceInCents + priceHikePerScooterInCents*scooterCount : scooter.price;
+            scooter.price = !scooter.inUse
+                ? defaultPriceInCents +
+                  priceHikePerScooterInCents * scooterCount
+                : scooter.price;
             await scooter.save();
             return {
                 statusCode: 200,
-                body: JSON.stringify(
-                    scooter,
-                    null,
-                    4
-                )
+                body: JSON.stringify(scooter, null, 4)
             };
         }
         // create
@@ -117,18 +114,15 @@ module.exports.createOrUpdate = async (event, context) => {
             coords: body.coords,
             battery: body.battery,
             speed: body.speed,
-            price: defaultPriceInCents + priceHikePerScooterInCents*scooterCount
+            price:
+                defaultPriceInCents + priceHikePerScooterInCents * scooterCount
         }).save();
 
         return {
             statusCode: 200,
-            body: JSON.stringify(
-                newScooter,
-                null,
-                4
-            )
+            body: JSON.stringify(newScooter, null, 4)
         };
-    } catch(err) {
+    } catch (err) {
         return {
             statusCode: 400,
             body: JSON.stringify(
@@ -149,13 +143,9 @@ module.exports.all = async (event, context) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify(
-                scooters,
-                null,
-                4
-            ),
+            body: JSON.stringify(scooters, null, 4)
         };
-    } catch(err){
+    } catch (err) {
         return {
             statusCode: 400,
             body: JSON.stringify(
